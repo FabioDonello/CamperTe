@@ -108,7 +108,7 @@ class CamperRepositoryTest {
         location = null,
         region = null,
         shortDescription = null,
-        photoUrl = null,
+        photoUrls = emptyList(),
         url = "https://example.com/$id",
     )
 

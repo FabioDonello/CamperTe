@@ -78,7 +78,7 @@ private fun SubitoItem.toListing(): Listing? {
         location = geo?.location(),
         region = geo?.region?.value,
         shortDescription = body,
-        photoUrl = images.firstOrNull()?.cdnBaseUrl?.let { it + PHOTO_RULE },
+        photoUrls = images.mapNotNull { image -> image.cdnBaseUrl?.let { it + PHOTO_RULE } },
         url = url,
     )
 }
