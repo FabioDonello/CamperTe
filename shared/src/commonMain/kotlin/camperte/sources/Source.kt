@@ -9,4 +9,7 @@ interface Source {
     suspend fun search(config: Config): List<Listing>
 }
 
-internal fun activeSources(): List<Source> = listOf(SubitoSource(createHttpClient()))
+internal fun activeSources(): List<Source> {
+    val client = createHttpClient()
+    return listOf(SubitoSource(client), CamperOnLineSource(client))
+}
