@@ -43,6 +43,13 @@ class SearchFiltersTest {
     }
 
     @Test
+    fun formatsValuesForDisplay() {
+        assertEquals("€ 15.000", defaults.minPriceText)
+        assertEquals("€ 35.000", defaults.maxPriceText)
+        assertEquals("150.000 km", defaults.maxMileageText)
+    }
+
+    @Test
     fun summarisesFilters() {
         assertEquals(
             "€ 15.000 – 35.000 · Lombardia, Emilia-Romagna, Veneto · dal 2008 · fino a 150.000 km · mansardato, semintegrale, furgonato",

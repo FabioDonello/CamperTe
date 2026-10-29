@@ -12,6 +12,9 @@ struct ListingsView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background(Color.screenBackground)
             .task { await model.load() }
+            .fullScreenCover(isPresented: filtersBinding) {
+                FiltersView(model: model)
+            }
             .onChange(of: scenePhase) { _, phase in
                 if phase == .background {
                     wasInBackground = true
@@ -22,12 +25,19 @@ struct ListingsView: View {
             }
     }
 
+    private var filtersBinding: Binding<Bool> {
+        Binding(
+            get: { model.editing != nil },
+            set: { if !$0 { Task { await model.closeFilters() } } }
+        )
+    }
+
     @ViewBuilder
     private var content: some View {
         if let result = model.result {
             switch onEnum(of: result) {
             case .found(let found):
-                FoundView(found: found, onRefresh: model.load)
+                FoundView(found: found, filtersSummary: model.filtersSummary, onRefresh: model.load, onOpenFilters: model.openFilters)
             case .noConnection:
                 NoConnectionView { Task { await model.retry() } }
             }
@@ -110,12 +120,14 @@ private struct RoundIcon: View {
 
 private struct FoundView: View {
     let found: SearchResultFound
+    let filtersSummary: String
     let onRefresh: () async -> Void
+    let onOpenFilters: () -> Void
 
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 20) {
-                Header(found: found)
+                Header(found: found, filtersSummary: filtersSummary, onOpenFilters: onOpenFilters)
                     .padding(.horizontal, 20)
                 if found.listings.isEmpty {
                     EmptyResultsView()
@@ -140,10 +152,30 @@ private struct FoundView: View {
 
 private struct Header: View {
     let found: SearchResultFound
+    let filtersSummary: String
+    let onOpenFilters: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            ScreenTitle()
+            HStack(spacing: 12) {
+                ScreenTitle()
+                Spacer(minLength: 0)
+                Button(action: onOpenFilters) {
+                    Label("Filtri", systemImage: "slider.horizontal.3")
+                }
+                .buttonStyle(ActionButtonStyle(horizontalPadding: 16, minHeight: 48, fontSize: 18))
+            }
+            Button(action: onOpenFilters) {
+                Text(filtersSummary)
+                    .scaledFont(17)
+                    .foregroundStyle(Color.secondaryText)
+                    .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(Color.pill, in: RoundedRectangle(cornerRadius: 14))
+            }
+            .accessibilityHint("Apre i filtri")
             FlowLayout {
                 Pill(text: "\(found.listings.count) camper")
                 if found.newCount > 0 {

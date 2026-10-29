@@ -27,6 +27,12 @@ data class SearchFilters(
     val camperTypes: List<String>,
     val area: SearchArea,
 ) {
+    val minPriceText: String get() = "€ ${minPrice.withThousandsSeparator()}"
+
+    val maxPriceText: String get() = "€ ${maxPrice.withThousandsSeparator()}"
+
+    val maxMileageText: String get() = "${maxMileageKm.withThousandsSeparator()} km"
+
     fun stepMinPrice(up: Boolean): SearchFilters =
         copy(minPrice = (minPrice + step(up, PRICE_STEP)).coerceIn(0, maxPrice))
 
@@ -45,10 +51,10 @@ data class SearchFilters(
     fun withArea(area: SearchArea): SearchFilters = copy(area = area)
 
     fun summaryText(configuredRegions: List<String>, hasPosition: Boolean): String = listOf(
-        "€ ${minPrice.withThousandsSeparator()} – ${maxPrice.withThousandsSeparator()}",
+        "$minPriceText – ${maxPrice.withThousandsSeparator()}",
         areaText(configuredRegions, hasPosition),
         "dal $minYear",
-        "fino a ${maxMileageKm.withThousandsSeparator()} km",
+        "fino a $maxMileageText",
         camperTypes.ifEmpty { listOf("tutte le tipologie") }.joinToString(", "),
     ).joinToString(" · ")
 
