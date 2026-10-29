@@ -16,9 +16,10 @@ class CamperRepository internal constructor(
     private val config: Config,
     private val clock: Clock,
     private val filtersStore: FiltersStore,
+    private val seenListings: SeenListings,
 ) {
     constructor(sources: List<Source>, config: Config, clock: Clock, settings: Settings) :
-        this(sources, config, clock, FiltersStore(settings, SearchFilters.from(config)))
+        this(sources, config, clock, FiltersStore(settings, SearchFilters.from(config)), SeenListings(settings))
 
     constructor() : this(activeSources(), readConfig(), Clock.System, Settings())
 
@@ -42,13 +43,12 @@ class CamperRepository internal constructor(
         val maxDistanceKm = (filters.area as? SearchArea.Nearby)?.km
         val filterConfig = if (maxDistanceKm != null && position != null) searchConfig.copy(regions = emptyList()) else searchConfig
         val listings = outcomes.filterIsInstance<SourceOutcome.Succeeded>().flatMap { it.listings }
+            .filter { matchesCriteria(it, filterConfig) && isWithinDistance(it, position, maxDistanceKm) }
+        val now = clock.now()
+        val newIds = seenListings.recordShown(listings.map { it.id }, now)
         return SearchResult.Found(
-            listings = sortListings(
-                listings
-                    .filter { matchesCriteria(it, filterConfig) && isWithinDistance(it, position, maxDistanceKm) }
-                    .map { toShown(it, position) }
-            ),
-            updatedAt = clock.now(),
+            listings = sortListings(listings.map { toShown(it, position, isNew = it.id in newIds) }),
+            updatedAt = now,
             unavailableSources = failures.map { it.sourceName },
         )
     }
@@ -83,10 +83,10 @@ class CamperRepository internal constructor(
             SourceOutcome.Failed(source.name, isConnectionError = e is IOException)
         }
 
-    private fun toShown(listing: Listing, position: GeoPoint?): ShownListing {
+    private fun toShown(listing: Listing, position: GeoPoint?, isNew: Boolean): ShownListing {
         val listingPosition = listing.position
         val distance = if (position != null && listingPosition != null) distanceKm(position, listingPosition).roundToInt() else null
-        return ShownListing(listing, findBonusWords(listing, config), isNew = false, distanceKm = distance)
+        return ShownListing(listing, findBonusWords(listing, config), isNew = isNew, distanceKm = distance)
     }
 
     private sealed interface SourceOutcome {

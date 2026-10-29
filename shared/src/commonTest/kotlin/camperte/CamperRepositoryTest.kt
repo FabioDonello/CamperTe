@@ -10,6 +10,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Instant
 
 class CamperRepositoryTest {
@@ -36,7 +37,27 @@ class CamperRepositoryTest {
         assertEquals(listOf("garage"), result.listings.first().bonusWords)
         assertEquals(now, result.updatedAt)
         assertEquals(emptyList(), result.unavailableSources)
-        assertEquals(0, result.newCount)
+        assertEquals(3, result.newCount)
+    }
+
+    @Test
+    fun marksOnlyListingsAppearedSinceLastOpeningAsNewAndShowsThemFirst() = runTest {
+        val settings = MapSettings()
+        var clockTime = now
+        val clock = object : Clock {
+            override fun now() = clockTime
+        }
+        CamperRepository(listOf(FakeSource("Uno", listing("old", price = 20000))), readConfig(), clock, settings)
+            .loadListings(null)
+        clockTime = now + 1.days
+        val source = FakeSource("Uno", listing("old", price = 20000), listing("fresh", price = 30000))
+
+        val result = assertIs<SearchResult.Found>(
+            CamperRepository(listOf(source), readConfig(), clock, settings).loadListings(null)
+        )
+
+        assertEquals(listOf("fresh" to true, "old" to false), result.listings.map { it.listing.id to it.isNew })
+        assertEquals(1, result.newCount)
     }
 
     @Test
