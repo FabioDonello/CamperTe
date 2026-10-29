@@ -2,6 +2,7 @@ package camperte.android
 
 import android.text.format.DateFormat
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +29,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -38,6 +40,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -56,13 +59,14 @@ fun ListingsScreen(
     onRefresh: () -> Unit,
     onRetry: () -> Unit,
     onOpenListing: (String) -> Unit,
+    onOpenFilters: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(color = MaterialTheme.colorScheme.background, modifier = modifier.fillMaxSize()) {
         when (val result = state.result) {
             null -> Loading()
             SearchResult.NoConnection -> NoConnection(onRetry)
-            is SearchResult.Found -> Found(result, state.isRefreshing, onRefresh, onOpenListing)
+            is SearchResult.Found -> Found(result, state.isRefreshing, state.filtersSummary, onRefresh, onOpenListing, onOpenFilters)
         }
     }
 }
@@ -122,8 +126,10 @@ private fun CenteredState(content: @Composable () -> Unit) {
 private fun Found(
     result: SearchResult.Found,
     isRefreshing: Boolean,
+    filtersSummary: String,
     onRefresh: () -> Unit,
     onOpenListing: (String) -> Unit,
+    onOpenFilters: () -> Unit,
 ) {
     val insets = WindowInsets.safeDrawing.asPaddingValues()
     PullToRefreshBox(isRefreshing = isRefreshing, onRefresh = onRefresh, modifier = Modifier.fillMaxSize()) {
@@ -135,7 +141,7 @@ private fun Found(
             ),
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
-            item(key = "header") { Header(result) }
+            item(key = "header") { Header(result, filtersSummary, onOpenFilters) }
             if (result.listings.isEmpty()) {
                 item(key = "empty") { Empty(Modifier.fillParentMaxHeight(0.7f)) }
             }
@@ -157,9 +163,24 @@ private fun Found(
 }
 
 @Composable
-private fun Header(result: SearchResult.Found) {
+private fun Header(result: SearchResult.Found, filtersSummary: String, onOpenFilters: () -> Unit) {
     Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Title()
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Title(Modifier.weight(1f))
+            FiltersButton(onOpenFilters)
+        }
+        Text(
+            filtersSummary,
+            fontSize = 17.sp,
+            lineHeight = 24.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(14.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .clickable(onClickLabel = stringResource(R.string.filters), onClick = onOpenFilters)
+                .padding(horizontal = 14.dp, vertical = 10.dp),
+        )
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Pill(pluralStringResource(R.plurals.listings_count, result.listings.size, result.listings.size))
             if (result.newCount > 0) {
@@ -174,6 +195,21 @@ private fun Header(result: SearchResult.Found) {
         if (result.unavailableSources.isNotEmpty()) {
             Warnings(result.unavailableSources)
         }
+    }
+}
+
+@Composable
+private fun FiltersButton(onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        shape = RoundedCornerShape(14.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp),
+        modifier = Modifier.heightIn(min = 48.dp),
+    ) {
+        Icon(painterResource(R.drawable.ic_tune), contentDescription = null)
+        Spacer(Modifier.width(8.dp))
+        Text(stringResource(R.string.filters), fontSize = 18.sp, fontWeight = FontWeight.Bold)
     }
 }
 
