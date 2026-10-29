@@ -22,6 +22,12 @@ dependencies {
 
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+
+    testDebugImplementation(libs.junit)
+    testDebugImplementation(libs.robolectric)
+    testDebugImplementation(platform(libs.androidx.compose.bom))
+    testDebugImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
 
 android {
@@ -43,6 +49,11 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+        }
+    }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
         }
     }
     compileOptions {
