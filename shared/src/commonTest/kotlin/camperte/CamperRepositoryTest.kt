@@ -156,6 +156,21 @@ class CamperRepositoryTest {
     }
 
     @Test
+    fun keepsListingsWithoutCoordinatesOnlyInNearbyRegions() = runTest {
+        val source = FakeSource(
+            "Uno",
+            listing("nearby-region", region = "Emilia-Romagna"),
+            listing("far-region", region = "Sicilia"),
+        )
+        val repository = repository(source)
+        repository.saveFilters(repository.currentFilters().withArea(SearchArea.Nearby(50)))
+
+        val result = assertIs<SearchResult.Found>(repository.loadListings(modena))
+
+        assertEquals(listOf("nearby-region"), result.listings.map { it.listing.id })
+    }
+
+    @Test
     fun fallsBackToConfiguredRegionsWithoutPosition() = runTest {
         val source = FakeSource("Uno")
         val repository = repository(source)

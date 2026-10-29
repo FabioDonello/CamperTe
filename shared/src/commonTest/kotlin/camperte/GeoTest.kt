@@ -34,4 +34,12 @@ class GeoTest {
     fun findsNoRegionsOutsideItaly() {
         assertEquals(emptyList(), regionsNear(GeoPoint(48.8566, 2.3522), 100))
     }
+
+    @Test
+    fun usesAppNamesForRegionsWrittenDifferently() {
+        assertEquals("Emilia-Romagna", italianRegionName("Emilia Romagna"))
+        assertEquals("Trentino-Alto Adige", italianRegionName("Trentino Alto Adige"))
+        assertEquals("Valle d'Aosta", italianRegionName("valle d aosta"))
+        assertEquals("Estero", italianRegionName(" Estero "))
+    }
 }

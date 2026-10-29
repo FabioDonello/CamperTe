@@ -45,3 +45,8 @@ internal fun regionsNear(point: GeoPoint, maxDistanceKm: Int): List<String> =
         .sortedBy { (_, distance) -> distance }
         .take(MAX_NEARBY_REGIONS)
         .map { (region, _) -> region.name }
+
+internal fun italianRegionName(name: String): String =
+    italianRegions.firstOrNull { it.name.lettersOnly() == name.lettersOnly() }?.name ?: name.trim()
+
+private fun String.lettersOnly(): String = lowercase().filter(Char::isLetter)

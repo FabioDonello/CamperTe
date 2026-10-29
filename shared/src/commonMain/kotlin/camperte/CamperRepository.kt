@@ -41,9 +41,13 @@ class CamperRepository internal constructor(
             return SearchResult.NoConnection
         }
         val maxDistanceKm = (filters.area as? SearchArea.Nearby)?.km
-        val filterConfig = if (maxDistanceKm != null && position != null) searchConfig.copy(regions = emptyList()) else searchConfig
+        val measuresDistance = maxDistanceKm != null && position != null
+        val anyRegionConfig = searchConfig.copy(regions = emptyList())
         val listings = outcomes.filterIsInstance<SourceOutcome.Succeeded>().flatMap { it.listings }
-            .filter { matchesCriteria(it, filterConfig) && isWithinDistance(it, position, maxDistanceKm) }
+            .filter { listing ->
+                val filterConfig = if (measuresDistance && listing.position != null) anyRegionConfig else searchConfig
+                matchesCriteria(listing, filterConfig) && isWithinDistance(listing, position, maxDistanceKm)
+            }
         val now = clock.now()
         val newIds = seenListings.recordShown(listings.map { it.id }, now)
         return SearchResult.Found(
