@@ -1,3 +1,23 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="it">
     <string name="app_name">CamperTe</string>
+    <string name="listings_title">I camper per voi</string>
+    <plurals name="listings_count">
+        <item quantity="one">%1$d camper</item>
+        <item quantity="many">%1$d camper</item>
+        <item quantity="other">%1$d camper</item>
+    </plurals>
+    <plurals name="new_count">
+        <item quantity="one">%1$d nuovo</item>
+        <item quantity="many">%1$d nuovi</item>
+        <item quantity="other">%1$d nuovi</item>
+    </plurals>
+    <string name="updated_at">alle %1$s</string>
+    <string name="source_unavailable">%1$s non è raggiungibile al momento</string>
+    <string name="loading">Sto cercando i camper per voi…</string>
+    <string name="no_connection">Nessuna connessione.\nRiprovate tra poco.</string>
+    <string name="retry">Riprova</string>
+    <string name="no_results">Oggi nessun camper nuovo corrisponde ai vostri criteri. Riprovate domani!</string>
+    <string name="photo_unavailable">Foto non disponibile</string>
+    <string name="new_badge">NUOVO</string>
+    <string name="open_listing">Vedi annuncio</string>
 </resources>
