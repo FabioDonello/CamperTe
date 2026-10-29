@@ -222,7 +222,6 @@ La prima versione è finita quando tutte queste condizioni sono vere:
 - [ ] In modalità aereo l'app mostra un messaggio comprensibile e il pulsante "Riprova", senza chiudersi
 - [ ] La logica di filtro ha test con `kotlin.test` in `commonTest` su annunci di esempio (dati mancanti inclusi), eseguiti con `./gradlew :shared:allTests`
 - [ ] Le UI native non contengono logica di filtro, ordinamento o rete
-- [ ] Il codice totale resta sotto le 1.000 righe circa
 
 **Prompt da incollare in Claude Code** (insieme a questo documento salvato come `SPEC.md` nella cartella del progetto):
 
