@@ -3,10 +3,14 @@ package camperte.android
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeLeft
 import camperte.Listing
 import camperte.SearchResult
 import camperte.ShownListing
@@ -36,7 +40,7 @@ class ListingsScreenTest {
             year = 2012,
             mileageKm = 98000,
             location = "Brescia",
-            photoUrl = "https://example.com/laika.jpg",
+            photoUrls = listOf("https://example.com/laika-1.jpg", "https://example.com/laika-2.jpg", "https://example.com/laika-3.jpg"),
         ),
         bonusWords = listOf("letto fisso", "garage"),
         isNew = true,
@@ -118,6 +122,25 @@ class ListingsScreenTest {
     }
 
     @Test
+    fun showsPhotoCounterAndMovesItWhenSwiping() {
+        setContent(found(listOf(complete)))
+
+        rule.onNodeWithContentDescription("Foto 1 di 3").assertIsDisplayed()
+        rule.onNodeWithText("1 / 3", useUnmergedTree = true).assertExists()
+
+        rule.onAllNodesWithContentDescription("Mansardato Laika Ecovip")[0].performTouchInput { swipeLeft() }
+
+        rule.onNodeWithContentDescription("Foto 2 di 3").assertIsDisplayed()
+    }
+
+    @Test
+    fun hidesPhotoCounterForSinglePhoto() {
+        setContent(found(listOf(ShownListing(listing(id = "one", title = "Uno", photoUrls = listOf("https://example.com/1.jpg")), emptyList(), false))))
+
+        rule.onAllNodesWithContentDescription("Foto", substring = true).assertCountEquals(0)
+    }
+
+    @Test
     fun openListingButtonOpensItsUrl() {
         setContent(found(listOf(complete, bare)))
 
@@ -143,7 +166,7 @@ class ListingsScreenTest {
         year: Int? = null,
         mileageKm: Int? = null,
         location: String? = null,
-        photoUrl: String? = null,
+        photoUrls: List<String> = emptyList(),
     ) = Listing(
         id = id,
         source = "Test",
@@ -156,7 +179,7 @@ class ListingsScreenTest {
         location = location,
         region = null,
         shortDescription = null,
-        photoUrl = photoUrl,
+        photoUrls = photoUrls,
         url = "https://example.com/$id",
     )
 

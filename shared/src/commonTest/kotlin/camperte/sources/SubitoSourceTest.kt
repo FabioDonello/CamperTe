@@ -38,8 +38,11 @@ class SubitoSourceTest {
         assertEquals("Olgiate Olona (VA)", listing.location)
         assertEquals("Lombardia", listing.region)
         assertEquals(
-            "https://images.sbito.it/api/v1/sbt-ads-images-pro/images/cc/cc17e691-0468-4120-bee3-6ac45b3a01bd?rule=gallery-desktop-2x-auto",
-            listing.photoUrl,
+            listOf(
+                "https://images.sbito.it/api/v1/sbt-ads-images-pro/images/cc/cc17e691-0468-4120-bee3-6ac45b3a01bd?rule=gallery-desktop-2x-auto",
+                "https://images.sbito.it/api/v1/sbt-ads-images-pro/images/aa/aa000000-0000-0000-0000-000000000002?rule=gallery-desktop-2x-auto",
+            ),
+            listing.photoUrls,
         )
         assertEquals("https://www.subito.it/caravan-e-camper/camper-arca-varese-632577382.htm", listing.url)
     }

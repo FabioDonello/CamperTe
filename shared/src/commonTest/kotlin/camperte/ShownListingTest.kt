@@ -56,7 +56,7 @@ class ShownListingTest {
             location = location,
             region = null,
             shortDescription = null,
-            photoUrl = null,
+            photoUrls = emptyList(),
             url = "https://example.com/test-1",
         ),
         bonusWords = emptyList(),

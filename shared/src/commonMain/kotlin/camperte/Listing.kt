@@ -12,7 +12,7 @@ data class Listing(
     val location: String?,
     val region: String?,
     val shortDescription: String?,
-    val photoUrl: String?,
+    val photoUrls: List<String>,
     val url: String,
 )
 

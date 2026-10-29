@@ -77,7 +77,7 @@ class ListingsViewModelTest {
                     location = null,
                     region = null,
                     shortDescription = null,
-                    photoUrl = null,
+                    photoUrls = emptyList(),
                     url = "https://example.com/test-1",
                 ),
             )

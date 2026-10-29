@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -37,6 +39,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -84,34 +88,103 @@ fun ListingCard(shown: ShownListing, onOpen: () -> Unit, modifier: Modifier = Mo
 
 @Composable
 private fun PhotoArea(shown: ShownListing) {
-    var photoFailed by remember(shown.listing.photoUrl) { mutableStateOf(false) }
+    val photos = shown.listing.photoUrls
+    val pagerState = rememberPagerState { photos.size }
     Box(
         modifier = Modifier.fillMaxWidth().height(240.dp).background(MaterialTheme.colorScheme.surfaceVariant),
         contentAlignment = Alignment.Center,
     ) {
-        val photoUrl = shown.listing.photoUrl
-        if (photoUrl == null || photoFailed) {
-            Text(
-                stringResource(R.string.photo_unavailable),
-                fontSize = 18.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = 40.dp),
-            )
+        if (photos.isEmpty()) {
+            PhotoUnavailable()
         } else {
-            AsyncImage(
-                model = photoUrl,
-                contentDescription = shown.listing.title,
-                contentScale = ContentScale.Crop,
-                onError = { photoFailed = true },
-                modifier = Modifier.fillMaxSize(),
-            )
+            HorizontalPager(state = pagerState, pageSpacing = 4.dp, modifier = Modifier.fillMaxSize()) { page ->
+                Photo(photos[page], shown.listing.title)
+            }
         }
         if (shown.isNew) {
             NewBadge(Modifier.align(Alignment.TopStart).padding(14.dp))
         }
-        shown.priceText?.let { PriceOverlay(it, Modifier.align(Alignment.BottomStart)) }
+        if (photos.size > 1) {
+            PhotoCounter(pagerState.currentPage + 1, photos.size, Modifier.align(Alignment.TopEnd).padding(14.dp))
+        }
+        BottomOverlay(shown.priceText, pagerState.currentPage, photos.size, Modifier.align(Alignment.BottomStart))
     }
 }
+
+@Composable
+private fun Photo(url: String, title: String) {
+    var failed by remember(url) { mutableStateOf(false) }
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        if (failed) {
+            PhotoUnavailable()
+        } else {
+            AsyncImage(
+                model = url,
+                contentDescription = title,
+                contentScale = ContentScale.Crop,
+                onError = { failed = true },
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
+    }
+}
+
+@Composable
+private fun PhotoUnavailable() {
+    Text(
+        stringResource(R.string.photo_unavailable),
+        fontSize = 18.sp,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(bottom = 40.dp),
+    )
+}
+
+@Composable
+private fun PhotoCounter(position: Int, total: Int, modifier: Modifier = Modifier) {
+    val description = stringResource(R.string.photo_position, position, total)
+    Row(
+        modifier = modifier
+            .background(Color.Black.copy(alpha = 0.62f), CircleShape)
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+            .clearAndSetSemantics { contentDescription = description },
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(painterResource(R.drawable.ic_photo_camera), contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
+        Text(stringResource(R.string.photo_counter, position, total), color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+    }
+}
+
+@Composable
+private fun BottomOverlay(price: String?, currentPage: Int, photoCount: Int, modifier: Modifier = Modifier) {
+    val showDots = photoCount in 2..MAX_DOTS
+    if (price == null && !showDots) return
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.75f))))
+            .padding(start = 18.dp, end = 18.dp, top = 28.dp, bottom = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.Bottom,
+    ) {
+        Text(price.orEmpty(), color = Color.White, fontSize = 30.sp, lineHeight = 36.sp, fontWeight = FontWeight.Bold)
+        if (showDots) {
+            PageDots(currentPage, photoCount, Modifier.padding(bottom = 12.dp))
+        }
+    }
+}
+
+@Composable
+private fun PageDots(currentPage: Int, count: Int, modifier: Modifier = Modifier) {
+    Row(modifier.clearAndSetSemantics {}, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        repeat(count) { page ->
+            val alpha = if (page == currentPage) 1f else 0.45f
+            Box(Modifier.size(9.dp).background(Color.White.copy(alpha = alpha), CircleShape))
+        }
+    }
+}
+
+private const val MAX_DOTS = 8
 
 @Composable
 private fun NewBadge(modifier: Modifier = Modifier) {
@@ -124,21 +197,6 @@ private fun NewBadge(modifier: Modifier = Modifier) {
         modifier = modifier
             .background(MaterialTheme.colorScheme.tertiary, CircleShape)
             .padding(horizontal = 12.dp, vertical = 6.dp),
-    )
-}
-
-@Composable
-private fun PriceOverlay(price: String, modifier: Modifier = Modifier) {
-    Text(
-        price,
-        color = Color.White,
-        fontSize = 30.sp,
-        lineHeight = 36.sp,
-        fontWeight = FontWeight.Bold,
-        modifier = modifier
-            .fillMaxWidth()
-            .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.75f))))
-            .padding(start = 18.dp, end = 18.dp, top = 28.dp, bottom = 12.dp),
     )
 }
 

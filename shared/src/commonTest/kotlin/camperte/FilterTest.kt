@@ -160,7 +160,7 @@ class FilterTest {
         location = null,
         region = region,
         shortDescription = description,
-        photoUrl = null,
+        photoUrls = emptyList(),
         url = "https://example.com/$id",
     )
 

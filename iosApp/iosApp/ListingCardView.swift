@@ -48,37 +48,60 @@ struct ListingCardView: View {
 private struct PhotoArea: View {
     let shown: ShownListing
 
+    @State private var page = 0
+
+    private var photos: [String] { shown.listing.photoUrls }
+
     var body: some View {
         Color.pill
             .frame(height: 240)
-            .overlay { photo }
+            .overlay { gallery }
             .clipped()
             .overlay(alignment: .bottomLeading) {
-                if let price = shown.priceText {
-                    PriceOverlay(price: price)
-                }
+                BottomOverlay(price: shown.priceText, page: page, photoCount: photos.count)
             }
             .overlay(alignment: .topLeading) {
                 if shown.isNew {
                     NewBadge().padding(14)
                 }
             }
+            .overlay(alignment: .topTrailing) {
+                if photos.count > 1 {
+                    PhotoCounter(position: page + 1, total: photos.count).padding(14)
+                }
+            }
     }
 
     @ViewBuilder
-    private var photo: some View {
-        if let photoUrl = shown.listing.photoUrl, let url = URL(string: photoUrl) {
-            AsyncImage(url: url) { phase in
-                if let image = phase.image {
-                    image.resizable().scaledToFill()
-                } else if phase.error != nil {
-                    PhotoUnavailable()
+    private var gallery: some View {
+        if photos.isEmpty {
+            PhotoUnavailable()
+        } else {
+            TabView(selection: $page) {
+                ForEach(Array(photos.enumerated()), id: \.offset) { index, url in
+                    Photo(url: url, title: shown.listing.title).tag(index)
                 }
             }
-            .accessibilityLabel(shown.listing.title)
-        } else {
-            PhotoUnavailable()
+            .tabViewStyle(.page(indexDisplayMode: .never))
         }
+    }
+}
+
+private struct Photo: View {
+    let url: String
+    let title: String
+
+    var body: some View {
+        AsyncImage(url: URL(string: url)) { phase in
+            if let image = phase.image {
+                image.resizable().scaledToFill()
+            } else if phase.error != nil {
+                PhotoUnavailable()
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .clipped()
+        .accessibilityLabel(title)
     }
 }
 
@@ -91,16 +114,61 @@ private struct PhotoUnavailable: View {
     }
 }
 
-private struct PriceOverlay: View {
-    let price: String
+private struct PhotoCounter: View {
+    let position: Int
+    let total: Int
 
     var body: some View {
-        Text(price)
-            .scaledFont(30, weight: .bold, relativeTo: .title)
+        Label("\(position) / \(total)", systemImage: "camera")
+            .scaledFont(16, weight: .medium)
             .foregroundStyle(.white)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(.black.opacity(0.62), in: Capsule())
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Foto \(position) di \(total)")
+    }
+}
+
+private struct BottomOverlay: View {
+    let price: String?
+    let page: Int
+    let photoCount: Int
+
+    private static let maxDots = 8
+
+    private var showsDots: Bool { (2...Self.maxDots).contains(photoCount) }
+
+    var body: some View {
+        if price != nil || showsDots {
+            HStack(alignment: .bottom) {
+                Text(price ?? "")
+                    .scaledFont(30, weight: .bold, relativeTo: .title)
+                Spacer()
+                if showsDots {
+                    PageDots(current: page, count: photoCount).padding(.bottom, 12)
+                }
+            }
+            .foregroundStyle(.white)
             .padding(EdgeInsets(top: 28, leading: 18, bottom: 12, trailing: 18))
             .background(LinearGradient(colors: [.clear, .black.opacity(0.75)], startPoint: .top, endPoint: .bottom))
+        }
+    }
+}
+
+private struct PageDots: View {
+    let current: Int
+    let count: Int
+
+    var body: some View {
+        HStack(spacing: 6) {
+            ForEach(0..<count, id: \.self) { index in
+                Circle()
+                    .fill(.white.opacity(index == current ? 1 : 0.45))
+                    .frame(width: 9, height: 9)
+            }
+        }
+        .accessibilityHidden(true)
     }
 }
 
