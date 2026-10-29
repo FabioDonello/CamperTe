@@ -76,7 +76,6 @@ private val price = Regex("""inserzione_tipo_mobile"><div>([^<]*)<""")
 private val photo = Regex("""<img [^>]*src="[^"]*timthumb\.php\?src=([^"&]+)""")
 private val town = Regex("""fa-city"></i>([^<]*?)\s*-\s*<i>""")
 private val province = Regex("""\s*(\([A-Z]{2}\))""")
-private val whitespace = Regex("""\s+""")
 
 private fun parseListing(block: String): Listing? {
     val link = titleLink.find(block) ?: return null
@@ -112,8 +111,6 @@ private fun location(text: String): String? {
     val place = decodeEntities(province.replace(text, "")).normalizeSpaces()
     return (listOf(place) + provinces).filter { it.isNotEmpty() }.joinToString(" ").ifEmpty { null }
 }
-
-private fun String.normalizeSpaces(): String = whitespace.replace(this, " ").trim()
 
 private fun decodeEntities(text: String): String =
     Regex("""&(#\d+|amp|quot|apos|lt|gt);""").replace(text) { match ->
