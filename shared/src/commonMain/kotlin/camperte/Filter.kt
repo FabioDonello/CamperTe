@@ -10,6 +10,11 @@ internal fun matchesCriteria(listing: Listing, config: Config): Boolean =
         containsRequiredWords(listing, config.requiredWords) &&
         wordsFound(listing, config.excludedWords).isEmpty()
 
+internal fun isWithinDistance(listing: Listing, from: GeoPoint?, maxKm: Int?): Boolean {
+    val listingPosition = listing.position
+    return from == null || maxKm == null || listingPosition == null || distanceKm(from, listingPosition) <= maxKm
+}
+
 internal fun findBonusWords(listing: Listing, config: Config): List<String> =
     wordsFound(listing, config.bonusWords)
 

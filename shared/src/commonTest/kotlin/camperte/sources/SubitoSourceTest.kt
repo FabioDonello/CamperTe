@@ -1,5 +1,6 @@
 package camperte.sources
 
+import camperte.GeoPoint
 import camperte.readConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
@@ -45,6 +46,7 @@ class SubitoSourceTest {
             listing.photoUrls,
         )
         assertEquals("https://www.subito.it/caravan-e-camper/camper-arca-varese-632577382.htm", listing.url)
+        assertEquals(GeoPoint(45.63278649999999, 8.884968200000001), listing.position)
     }
 
     @Test

@@ -162,8 +162,9 @@ class FilterTest {
         shortDescription = description,
         photoUrls = emptyList(),
         url = "https://example.com/$id",
+        position = null,
     )
 
     private fun shown(id: String, price: Int?, bonusWords: List<String> = emptyList(), isNew: Boolean = false) =
-        ShownListing(listing(id = id, price = price), bonusWords, isNew)
+        ShownListing(listing(id = id, price = price), bonusWords, isNew, distanceKm = null)
 }

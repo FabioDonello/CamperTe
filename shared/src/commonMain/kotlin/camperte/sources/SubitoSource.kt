@@ -1,6 +1,7 @@
 package camperte.sources
 
 import camperte.Config
+import camperte.GeoPoint
 import camperte.Listing
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
@@ -80,6 +81,7 @@ private fun SubitoItem.toListing(): Listing? {
         shortDescription = body,
         photoUrls = images.mapNotNull { image -> image.cdnBaseUrl?.let { it + PHOTO_RULE } },
         url = url,
+        position = geo?.map?.toGeoPoint(),
     )
 }
 
@@ -127,7 +129,16 @@ private data class Feature(val values: List<FeatureValue> = emptyList())
 private data class FeatureValue(val key: String? = null, val value: String? = null)
 
 @Serializable
-private data class Geo(val region: Named? = null, val city: City? = null, val town: Named? = null)
+private data class Geo(val region: Named? = null, val city: City? = null, val town: Named? = null, val map: MapPoint? = null)
+
+@Serializable
+private data class MapPoint(val latitude: String? = null, val longitude: String? = null) {
+    fun toGeoPoint(): GeoPoint? {
+        val lat = latitude?.toDoubleOrNull() ?: return null
+        val lon = longitude?.toDoubleOrNull() ?: return null
+        return GeoPoint(lat, lon)
+    }
+}
 
 @Serializable
 private data class Named(val value: String? = null)

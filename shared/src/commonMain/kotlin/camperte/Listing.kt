@@ -14,13 +14,17 @@ data class Listing(
     val shortDescription: String?,
     val photoUrls: List<String>,
     val url: String,
+    val position: GeoPoint?,
 )
 
 data class ShownListing(
     val listing: Listing,
     val bonusWords: List<String>,
     val isNew: Boolean,
+    val distanceKm: Int?,
 ) {
+    val distanceText: String? get() = distanceKm?.let { "a $it km" }
+
     val priceText: String? get() = listing.price?.let { "€ ${it.withThousandsSeparator()}" }
 
     val detailsText: String
@@ -33,4 +37,4 @@ data class ShownListing(
         ).joinToString(" · ")
 }
 
-private fun Int.withThousandsSeparator(): String = toString().reversed().chunked(3).joinToString(".").reversed()
+internal fun Int.withThousandsSeparator(): String = toString().reversed().chunked(3).joinToString(".").reversed()
