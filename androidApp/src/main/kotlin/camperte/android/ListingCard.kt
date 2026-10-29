@@ -18,8 +18,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
@@ -67,12 +68,13 @@ fun ListingCard(shown: ShownListing, onOpen: () -> Unit, modifier: Modifier = Mo
             if (shown.bonusWords.isNotEmpty()) {
                 BonusWords(shown.bonusWords)
             }
-            FilledTonalButton(
+            Button(
                 onClick = onOpen,
                 shape = RoundedCornerShape(14.dp),
-                modifier = Modifier.padding(top = 4.dp).fillMaxWidth().heightIn(min = 52.dp),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp),
+                modifier = Modifier.padding(top = 4.dp).fillMaxWidth().heightIn(min = 56.dp),
             ) {
-                Text(stringResource(R.string.open_listing), fontSize = 18.sp, fontWeight = FontWeight.Medium)
+                Text(stringResource(R.string.open_listing), fontSize = 19.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.width(8.dp))
                 Icon(painterResource(R.drawable.ic_arrow_forward), contentDescription = null)
             }

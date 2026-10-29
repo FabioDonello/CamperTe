@@ -73,6 +73,7 @@ private fun Loading() {
         CircularProgressIndicator(
             modifier = Modifier.size(56.dp),
             strokeWidth = 5.dp,
+            color = MaterialTheme.colorScheme.secondary,
             trackColor = MaterialTheme.colorScheme.secondaryContainer,
         )
         Text(stringResource(R.string.loading), fontSize = 20.sp, lineHeight = 28.sp, textAlign = TextAlign.Center)
@@ -98,7 +99,7 @@ private fun NoConnection(onRetry: () -> Unit) {
         ) {
             Icon(painterResource(R.drawable.ic_refresh), contentDescription = null)
             Spacer(Modifier.width(10.dp))
-            Text(stringResource(R.string.retry), fontSize = 19.sp, fontWeight = FontWeight.Medium)
+            Text(stringResource(R.string.retry), fontSize = 19.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -226,7 +227,7 @@ private fun Empty(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        RoundIcon(R.drawable.ic_camper, MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.primary)
+        RoundIcon(R.drawable.ic_camper, MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.secondary)
         Text(stringResource(R.string.no_results), fontSize = 22.sp, lineHeight = 31.sp, textAlign = TextAlign.Center)
     }
 }
