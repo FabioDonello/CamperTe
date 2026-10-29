@@ -9,12 +9,12 @@ import kotlinx.coroutines.supervisorScope
 import kotlinx.io.IOException
 import kotlin.time.Clock
 
-class CamperRepository internal constructor(
+class CamperRepository(
     private val sources: List<Source>,
     private val config: Config,
     private val clock: Clock,
 ) {
-    constructor() : this(activeSources, readConfig(), Clock.System)
+    constructor() : this(activeSources(), readConfig(), Clock.System)
 
     suspend fun loadListings(): SearchResult {
         val outcomes = searchAll()

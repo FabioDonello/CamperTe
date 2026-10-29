@@ -9,4 +9,4 @@ interface Source {
     suspend fun search(config: Config): List<Listing>
 }
 
-internal val activeSources: List<Source> = listOf(SampleSource())
+internal fun activeSources(): List<Source> = listOf(SubitoSource(createHttpClient()))

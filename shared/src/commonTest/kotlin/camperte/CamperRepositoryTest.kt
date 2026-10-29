@@ -94,13 +94,6 @@ class CamperRepositoryTest {
         assertEquals(1_000, currentTime)
     }
 
-    @Test
-    fun defaultRepositoryLoadsSampleListings() = runTest {
-        val result = assertIs<SearchResult.Found>(CamperRepository().loadListings())
-
-        assertEquals(listOf("sample-1", "sample-3", "sample-2"), result.listings.map { it.listing.id })
-    }
-
     private fun repository(vararg sources: Source) = CamperRepository(sources.toList(), readConfig(), fixedClock)
 
     private fun listing(id: String, price: Int? = null, title: String = "Camper") = Listing(
