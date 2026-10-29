@@ -54,6 +54,13 @@ class SubitoSourceTest {
     }
 
     @Test
+    fun treatsCamperPuroAsVan() {
+        val page = SUBITO_PAGE.replace("\"value\": \"Mansardato\"", "\"value\": \"Camper puro\"")
+
+        assertEquals("furgonato", parseSubitoPage(page).first().camperType)
+    }
+
+    @Test
     fun skipsAdvertisingSlots() {
         assertEquals(3, parseSubitoPage(SUBITO_PAGE).size)
     }

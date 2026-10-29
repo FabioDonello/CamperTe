@@ -15,11 +15,11 @@ class ConfigTest {
         assertEquals(35000, config.maxPrice)
         assertEquals(2008, config.minYear)
         assertEquals(150000, config.maxMileageKm)
-        assertEquals(listOf("mansardato", "semintegrale"), config.camperTypes)
+        assertEquals(listOf("mansardato", "semintegrale", "furgonato"), config.camperTypes)
         assertEquals(4, config.minBerths)
         assertEquals(listOf("Lombardia", "Emilia-Romagna", "Veneto"), config.regions)
         assertTrue(config.requiredWords.isEmpty())
-        assertEquals(listOf("incidentato", "da riparare", "noleggio", "cerco"), config.excludedWords)
+        assertEquals(listOf("incidentato", "da riparare", "noleggio", "cerco", "caravan", "roulotte"), config.excludedWords)
         assertEquals(listOf("letto fisso", "garage", "pannello solare", "tagliandato"), config.bonusWords)
     }
 

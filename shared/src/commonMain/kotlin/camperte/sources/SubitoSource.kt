@@ -59,8 +59,7 @@ private val camperTypes = mapOf(
     "mansardato" to "mansardato",
     "semi-integrale" to "semintegrale",
     "motorhome" to "motorhome",
-    "camper puro" to "puro",
-    "furgonato" to "furgonato",
+    "camper puro" to "furgonato",
     "caravan/roulotte" to "caravan",
 )
 
