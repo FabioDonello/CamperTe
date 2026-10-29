@@ -62,6 +62,13 @@ class FilterTest {
     }
 
     @Test
+    fun keepsVansAndDiscardsCaravans() {
+        assertTrue(matchesCriteria(listing(camperType = "furgonato"), config))
+        assertFalse(matchesCriteria(listing(title = "Roulotte Burstner Averso"), config))
+        assertFalse(matchesCriteria(listing(title = "Knaus Sport", description = "Caravan 4 posti"), config))
+    }
+
+    @Test
     fun acceptsAnyCamperTypeWhenListIsEmpty() {
         assertTrue(matchesCriteria(listing(camperType = "integrale"), config.copy(camperTypes = emptyList())))
     }

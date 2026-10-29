@@ -10,11 +10,11 @@ const val CONFIG_JSON = """
   "max_price": 35000,
   "min_year": 2008,
   "max_mileage_km": 150000,
-  "camper_types": ["mansardato", "semintegrale"],
+  "camper_types": ["mansardato", "semintegrale", "furgonato"],
   "min_berths": 4,
   "regions": ["Lombardia", "Emilia-Romagna", "Veneto"],
   "required_words": [],
-  "excluded_words": ["incidentato", "da riparare", "noleggio", "cerco"],
+  "excluded_words": ["incidentato", "da riparare", "noleggio", "cerco", "caravan", "roulotte"],
   "bonus_words": ["letto fisso", "garage", "pannello solare", "tagliandato"]
 }
 """
