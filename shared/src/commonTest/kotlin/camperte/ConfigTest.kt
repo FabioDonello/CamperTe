@@ -9,24 +9,24 @@ class ConfigTest {
 
     @Test
     fun readsBundledConfig() {
-        val config = leggiConfig()
+        val config = readConfig()
 
-        assertEquals(15000, config.prezzoMin)
-        assertEquals(35000, config.prezzoMax)
-        assertEquals(2008, config.annoMin)
-        assertEquals(150000, config.kmMax)
-        assertEquals(listOf("mansardato", "semintegrale"), config.tipologie)
-        assertEquals(4, config.postiLettoMin)
-        assertEquals(listOf("Lombardia", "Emilia-Romagna", "Veneto"), config.regioni)
-        assertTrue(config.paroleObbligatorie.isEmpty())
-        assertEquals(listOf("incidentato", "da riparare", "noleggio", "cerco"), config.paroleEscluse)
-        assertEquals(listOf("letto fisso", "garage", "pannello solare", "tagliandato"), config.paroleBonus)
+        assertEquals(15000, config.minPrice)
+        assertEquals(35000, config.maxPrice)
+        assertEquals(2008, config.minYear)
+        assertEquals(150000, config.maxMileageKm)
+        assertEquals(listOf("mansardato", "semintegrale"), config.camperTypes)
+        assertEquals(4, config.minBerths)
+        assertEquals(listOf("Lombardia", "Emilia-Romagna", "Veneto"), config.regions)
+        assertTrue(config.requiredWords.isEmpty())
+        assertEquals(listOf("incidentato", "da riparare", "noleggio", "cerco"), config.excludedWords)
+        assertEquals(listOf("letto fisso", "garage", "pannello solare", "tagliandato"), config.bonusWords)
     }
 
     @Test
     fun rejectsConfigWithMissingField() {
         assertFailsWith<IllegalArgumentException> {
-            leggiConfig("""{ "prezzo_min": 15000 }""")
+            readConfig("""{ "min_price": 15000 }""")
         }
     }
 }

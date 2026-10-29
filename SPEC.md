@@ -21,7 +21,7 @@ L'app è costruita con **Kotlin Multiplatform (KMP)**: un modulo `shared` contie
 
 Perché funziona senza backend: un'app nativa, a differenza di una pagina web nel browser, non ha restrizioni CORS e può leggere direttamente le pagine di ricerca dei siti di annunci.
 
-Regola di confine: le interfacce native non contengono logica. Chiamano una sola funzione condivisa, `CamperRepository.caricaAnnunci()`, e mostrano il risultato.
+Regola di confine: le interfacce native non contengono logica. Chiamano una sola funzione condivisa, `CamperRepository.loadListings()`, e mostrano il risultato.
 
 **Stack (ultime versioni stabili)**
 
@@ -40,26 +40,26 @@ camperte/
 │   └── src/
 │       ├── commonMain/kotlin/camperte/
 │       │   ├── Config.kt            # criteri di ricerca (JSON)
-│       │   ├── Annuncio.kt          # modello comune
-│       │   ├── Filtro.kt            # applica i criteri, funzioni pure
-│       │   ├── Visti.kt             # memoria degli annunci visti
+│       │   ├── Listing.kt           # modello comune
+│       │   ├── Filter.kt            # applica i criteri, funzioni pure
+│       │   ├── SeenListings.kt      # memoria degli annunci visti
 │       │   ├── CamperRepository.kt  # unico punto di ingresso per le UI
-│       │   └── fonti/
-│       │       ├── Fonte.kt         # interfaccia comune + elenco fonti attive
-│       │       └── SubitoFonte.kt   # un file per ogni sito di annunci
+│       │   └── sources/
+│       │       ├── Source.kt        # interfaccia comune + elenco fonti attive
+│       │       └── SubitoSource.kt  # un file per ogni sito di annunci
 │       ├── androidMain/             # motore HTTP Android
 │       ├── iosMain/                 # motore HTTP iOS
-│       └── commonTest/kotlin/FiltroTest.kt
+│       └── commonTest/kotlin/FilterTest.kt
 ├── androidApp/
 │   └── src/main/kotlin/.../
 │       ├── MainActivity.kt
-│       ├── AnnunciScreen.kt
-│       └── SchedaAnnuncio.kt
+│       ├── ListingsScreen.kt
+│       └── ListingCard.kt
 └── iosApp/
     └── iosApp/
         ├── CamperTeApp.swift
-        ├── AnnunciView.swift
-        └── SchedaAnnuncioView.swift
+        ├── ListingsView.swift
+        └── ListingCardView.swift
 ```
 
 ## Configurazione dei criteri
@@ -68,16 +68,16 @@ Tutti i gusti dei miei genitori stanno in un testo JSON dentro Config.kt (modulo
 
 ```json
 {
-  "prezzo_min": 15000,
-  "prezzo_max": 35000,
-  "anno_min": 2008,
-  "km_max": 150000,
-  "tipologie": ["mansardato", "semintegrale"],
-  "posti_letto_min": 4,
-  "regioni": ["Lombardia", "Emilia-Romagna", "Veneto"],
-  "parole_obbligatorie": [],
-  "parole_escluse": ["incidentato", "da riparare", "noleggio", "cerco"],
-  "parole_bonus": ["letto fisso", "garage", "pannello solare", "tagliandato"]
+  "min_price": 15000,
+  "max_price": 35000,
+  "min_year": 2008,
+  "max_mileage_km": 150000,
+  "camper_types": ["mansardato", "semintegrale"],
+  "min_berths": 4,
+  "regions": ["Lombardia", "Emilia-Romagna", "Veneto"],
+  "required_words": [],
+  "excluded_words": ["incidentato", "da riparare", "noleggio", "cerco"],
+  "bonus_words": ["letto fisso", "garage", "pannello solare", "tagliandato"]
 }
 ```
 
@@ -85,14 +85,14 @@ Significato dei campi:
 
 | Campo | Effetto |
 | --- | --- |
-| `prezzo_min`, `prezzo_max` | Fascia di prezzo in euro; fuori fascia l'annuncio viene scartato |
-| `anno_min`, `km_max` | Anno di immatricolazione minimo e chilometri massimi |
-| `tipologie` | Tipi di camper accettati; se il tipo non è riconoscibile l'annuncio resta, senza penalità |
-| `posti_letto_min` | Posti letto minimi, se l'annuncio li indica |
-| `regioni` | Zone di ricerca; lista vuota = tutta Italia |
-| `parole_obbligatorie` | Parole che devono comparire nel titolo o nella descrizione |
-| `parole_escluse` | Se compare una di queste, l'annuncio viene scartato |
-| `parole_bonus` | Non scartano nulla: alzano l'annuncio in classifica e vengono evidenziate |
+| `min_price`, `max_price` | Fascia di prezzo in euro; fuori fascia l'annuncio viene scartato |
+| `min_year`, `max_mileage_km` | Anno di immatricolazione minimo e chilometri massimi |
+| `camper_types` | Tipi di camper accettati; se il tipo non è riconoscibile l'annuncio resta, senza penalità |
+| `min_berths` | Posti letto minimi, se l'annuncio li indica |
+| `regions` | Zone di ricerca; lista vuota = tutta Italia |
+| `required_words` | Parole che devono comparire nel titolo o nella descrizione |
+| `excluded_words` | Se compare una di queste, l'annuncio viene scartato |
+| `bonus_words` | Non scartano nulla: alzano l'annuncio in classifica e vengono evidenziate |
 
 Regola importante: un dato mancante nell'annuncio (es. km non indicati) non deve mai causarne lo scarto. Meglio mostrare un annuncio in più che perderne uno buono.
 
@@ -100,29 +100,29 @@ Il JSON è una costante `CONFIG_JSON` letta con `kotlinx.serialization` (con `@S
 
 ## Flusso di funzionamento
 
-Ogni apertura dell'app, e ogni trascinamento verso il basso della lista, chiama `CamperRepository.caricaAnnunci()`, che esegue nel modulo condiviso gli stessi quattro passi e restituisce un unico risultato.
+Ogni apertura dell'app, e ogni trascinamento verso il basso della lista, chiama `CamperRepository.loadListings()`, che esegue nel modulo condiviso gli stessi quattro passi e restituisce un unico risultato.
 
-1. **Scarica gli annunci** da ogni fonte attiva, restringendo già la ricerca a camper, fascia di prezzo e regioni quando il sito lo permette. Le fonti vengono interrogate in parallelo con `async` dentro `supervisorScope`, così l'errore di una non ferma le altre. Ogni annuncio diventa una `data class Annuncio`:
-   - `id` (univoco, es. `subito-123456`), `fonte`, `titolo`, `prezzo`, `anno`, `km`, `tipologia`, `postiLetto`, `localita`, `descrizioneBreve`, `fotoUrl`, `link` (i campi sconosciuti valgono `null`)
-2. **Filtra** con le regole di `config.json` e calcola un punteggio semplice: +1 per ogni parola bonus trovata. `Filtro.kt` contiene solo funzioni pure, senza rete né memoria, così è facile da testare.
-3. **Confronta con la memoria locale** (`multiplatform-settings`, chiave `visti`, id e data in JSON) per marcare come "Nuovo" gli annunci mai mostrati prima, poi la aggiorna. Gli annunci più vecchi di 90 giorni vengono tolti.
-4. **Restituisce un `RisultatoRicerca`** con la lista ordinata, il numero di nuovi, l'ora dell'aggiornamento e gli avvisi sulle fonti fallite. Le UI lo mostrano così com'è; mentre attendono, una rotellina con la scritta "Sto cercando i camper per voi...".
+1. **Scarica gli annunci** da ogni fonte attiva, restringendo già la ricerca a camper, fascia di prezzo e regioni quando il sito lo permette. Le fonti vengono interrogate in parallelo con `async` dentro `supervisorScope`, così l'errore di una non ferma le altre. Ogni annuncio diventa una `data class Listing`:
+   - `id` (univoco, es. `subito-123456`), `source`, `title`, `price`, `year`, `mileageKm`, `camperType`, `berths`, `location`, `region`, `shortDescription`, `photoUrl`, `url` (i campi sconosciuti valgono `null`)
+2. **Filtra** con le regole di `config.json` e calcola un punteggio semplice: +1 per ogni parola bonus trovata. `Filter.kt` contiene solo funzioni pure, senza rete né memoria, così è facile da testare.
+3. **Confronta con la memoria locale** (`multiplatform-settings`, chiave `seen_listings`, id e data in JSON) per marcare come "Nuovo" gli annunci mai mostrati prima, poi la aggiorna. Gli annunci più vecchi di 90 giorni vengono tolti.
+4. **Restituisce un `SearchResult`** con la lista ordinata, il numero di nuovi, l'ora dell'aggiornamento e gli avvisi sulle fonti fallite. Le UI lo mostrano così com'è; mentre attendono, una rotellina con la scritta "Sto cercando i camper per voi...".
 
-Se una fonte non risponde o il sito blocca la richiesta, il risultato contiene gli annunci delle altre fonti e un avviso ("Subito non è raggiungibile al momento"). Senza internet le UI mostrano "Nessuna connessione. Riprovate tra poco." con un pulsante "Riprova". L'app non deve mai mostrare errori tecnici né chiudersi: `caricaAnnunci()` non lancia eccezioni verso le UI.
+Se una fonte non risponde o il sito blocca la richiesta, il risultato contiene gli annunci delle altre fonti e un avviso ("Subito non è raggiungibile al momento"). Senza internet le UI mostrano "Nessuna connessione. Riprovate tra poco." con un pulsante "Riprova". L'app non deve mai mostrare errori tecnici né chiudersi: `loadListings()` non lancia eccezioni verso le UI.
 
 ## Fonti degli annunci
 
-Si parte con una sola fonte, Subito.it, e solo quando funziona bene se ne aggiungono altre. Ogni fonte è un file in `shared/.../fonti/` che implementa una sola interfaccia:
+Si parte con una sola fonte, Subito.it, e solo quando funziona bene se ne aggiungono altre. Ogni fonte è un file in `shared/.../sources/` che implementa una sola interfaccia:
 
 ```kotlin
-interface Fonte {
-    val nome: String
-    // Restituisce gli annunci nel formato comune. In caso di errore lancia un'eccezione.
-    suspend fun cerca(config: Config): List<Annuncio>
+interface Source {
+    val name: String
+    // Returns listings in the common format; throws on failure.
+    suspend fun search(config: Config): List<Listing>
 }
 ```
 
-Così aggiungere AutoScout24 o un concessionario locale significa solo creare un nuovo file e aggiungerlo alla lista `fontiAttive` in `Fonte.kt`. Le fonti vivono solo in `commonMain`: nessun codice di rete specifico per piattaforma oltre al motore Ktor.
+Così aggiungere AutoScout24 o un concessionario locale significa solo creare un nuovo file e aggiungerlo alla lista `activeSources` in `Source.kt`. Le fonti vivono solo in `commonMain`: nessun codice di rete specifico per piattaforma oltre al motore Ktor.
 
 Indicazioni per Claude Code:
 
@@ -163,7 +163,7 @@ I miei genitori trovano l'icona CamperTe sul telefono, la toccano e vedono gli a
 - **Android:** genero un APK firmato con Gradle (`./gradlew :androidApp:assembleRelease`) e lo installo direttamente sul telefono, senza Play Store.
 - **iPhone:** con un Apple ID gratuito installo da Xcode, ma l'app smette di aprirsi dopo 7 giorni. Per un'installazione che non scada serve un account Apple Developer (99 $ l'anno) e la distribuzione via TestFlight o ad hoc.
 - **Aggiornamenti:** per cambiare criteri o correggere qualcosa reinstallo l'app (nuovo APK, nuova build iOS).
-- Un file `LEGGIMI.md` breve spiega, per me, questi passaggi e come modificare i criteri in `Config.kt`.
+- Un file `README.md` breve spiega, per me, questi passaggi e come modificare i criteri in `Config.kt`.
 
 **Fuori dal perimetro (da non costruire):**
 
@@ -195,11 +195,11 @@ Leggi SPEC.md: è la specifica completa dell'app mobile CamperTe.
 Costruiscila passo per passo con Kotlin Multiplatform e UI native
 (Jetpack Compose su Android, SwiftUI su iOS), con la massima semplicità.
 1. Crea il progetto KMP (shared, androidApp, iosApp) e Config.kt di esempio.
-2. Scrivi Annuncio.kt e Filtro.kt con i test in commonTest, usando annunci finti.
+2. Scrivi Listing.kt e Filter.kt con i test in commonTest, usando annunci finti.
 3. Scrivi CamperRepository con una fonte finta, poi la UI Compose e verificala su Android.
 4. Scrivi la UI SwiftUI con SKIE e verificala nel simulatore iOS.
-5. Solo dopo, ispeziona la ricerca reale di Subito.it e scrivi SubitoFonte.kt.
-6. Aggiungi Visti.kt e la configurazione per l'APK firmato.
+5. Solo dopo, ispeziona la ricerca reale di Subito.it e scrivi SubitoSource.kt.
+6. Aggiungi SeenListings.kt e la configurazione per l'APK firmato.
 Fermati dopo ogni passo e mostrami cosa hai fatto prima di continuare.
 Non aggiungere nulla che sia nella sezione "Fuori dal perimetro".
 ```
