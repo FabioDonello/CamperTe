@@ -20,4 +20,17 @@ data class ShownListing(
     val listing: Listing,
     val bonusWords: List<String>,
     val isNew: Boolean,
-)
+) {
+    val priceText: String? get() = listing.price?.let { "€ ${it.withThousandsSeparator()}" }
+
+    val detailsText: String
+        get() = listOfNotNull(
+            listing.year?.toString(),
+            listing.mileageKm?.let { "${it.withThousandsSeparator()} km" },
+            listing.camperType,
+            listing.berths?.let { if (it == 1) "1 posto letto" else "$it posti letto" },
+            listing.location,
+        ).joinToString(" · ")
+}
+
+private fun Int.withThousandsSeparator(): String = toString().reversed().chunked(3).joinToString(".").reversed()
