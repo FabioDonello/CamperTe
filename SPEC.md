@@ -1,10 +1,10 @@
-# CamperGiusto – Specifica per Claude Code
+# CamperTe – Specifica per Claude Code
 
 Oct 29, 2026 · @Fabio
 
 ## Obiettivo e principi
 
-CamperGiusto è un'app mobile personale, per Android e iPhone, che all'apertura mostra una sola schermata con i soli annunci di camper usati che rispettano i criteri dei miei genitori. Nient'altro.
+CamperTe è un'app mobile personale, per Android e iPhone, che all'apertura mostra una sola schermata con i soli annunci di camper usati che rispettano i criteri dei miei genitori. Nient'altro.
 
 Principi da rispettare in ogni scelta di codice:
 
@@ -34,11 +34,11 @@ Regola di confine: le interfacce native non contengono logica. Chiamano una sola
 **Struttura dei file**
 
 ```
-campergiusto/
+camperte/
 ├── settings.gradle.kts
 ├── shared/
 │   └── src/
-│       ├── commonMain/kotlin/campergiusto/
+│       ├── commonMain/kotlin/camperte/
 │       │   ├── Config.kt            # criteri di ricerca (JSON)
 │       │   ├── Annuncio.kt          # modello comune
 │       │   ├── Filtro.kt            # applica i criteri, funzioni pure
@@ -57,7 +57,7 @@ campergiusto/
 │       └── SchedaAnnuncio.kt
 └── iosApp/
     └── iosApp/
-        ├── CamperGiustoApp.swift
+        ├── CamperTeApp.swift
         ├── AnnunciView.swift
         └── SchedaAnnuncioView.swift
 ```
@@ -157,7 +157,7 @@ L'app ha una sola schermata, realizzata due volte in modo nativo e identico nei 
 
 ## Installazione e cosa è escluso
 
-I miei genitori trovano l'icona CamperGiusto sul telefono, la toccano e vedono gli annunci. Tutta la parte tecnica la gestisco io.
+I miei genitori trovano l'icona CamperTe sul telefono, la toccano e vedono gli annunci. Tutta la parte tecnica la gestisco io.
 
 - **Strumenti:** Android Studio con il plugin Kotlin Multiplatform; per la parte iOS serve obbligatoriamente un Mac con Xcode.
 - **Android:** genero un APK firmato con Gradle (`./gradlew :androidApp:assembleRelease`) e lo installo direttamente sul telefono, senza Play Store.
@@ -191,7 +191,7 @@ La prima versione è finita quando tutte queste condizioni sono vere:
 **Prompt da incollare in Claude Code** (insieme a questo documento salvato come `SPEC.md` nella cartella del progetto):
 
 ```
-Leggi SPEC.md: è la specifica completa dell'app mobile CamperGiusto.
+Leggi SPEC.md: è la specifica completa dell'app mobile CamperTe.
 Costruiscila passo per passo con Kotlin Multiplatform e UI native
 (Jetpack Compose su Android, SwiftUI su iOS), con la massima semplicità.
 1. Crea il progetto KMP (shared, androidApp, iosApp) e Config.kt di esempio.

@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		304EABBF91554F141992C728 /* CamperGiusto.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CamperGiusto.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		304EABBF91554F141992C728 /* CamperTe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CamperTe.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -46,7 +46,7 @@
 		CA67F441485F5ED5D352AB4C /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				304EABBF91554F141992C728 /* CamperGiusto.app */,
+				304EABBF91554F141992C728 /* CamperTe.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -72,7 +72,7 @@
 			);
 			name = iosApp;
 			productName = iosApp;
-			productReference = 304EABBF91554F141992C728 /* CamperGiusto.app */;
+			productReference = 304EABBF91554F141992C728 /* CamperTe.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -220,7 +220,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = CamperGiusto;
+				INFOPLIST_KEY_CFBundleDisplayName = CamperTe;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -311,7 +311,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = CamperGiusto;
+				INFOPLIST_KEY_CFBundleDisplayName = CamperTe;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

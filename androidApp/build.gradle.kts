@@ -25,11 +25,11 @@ dependencies {
 }
 
 android {
-    namespace = "campergiusto.android"
+    namespace = "camperte.android"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.fabiodonello.campergiusto"
+        applicationId = "com.fabiodonello.camperte"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1

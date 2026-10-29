@@ -15,12 +15,12 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "Shared"
             isStatic = true
-            binaryOption("bundleId", "campergiusto.shared")
+            binaryOption("bundleId", "camperte.shared")
         }
     }
 
     androidLibrary {
-        namespace = "campergiusto.shared"
+        namespace = "camperte.shared"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 

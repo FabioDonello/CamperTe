@@ -2,10 +2,10 @@ import Shared
 import SwiftUI
 
 @main
-struct CamperGiustoApp: App {
+struct CamperTeApp: App {
     var body: some Scene {
         WindowGroup {
-            Text("CamperGiusto")
+            Text("CamperTe")
                 .font(.largeTitle)
         }
     }

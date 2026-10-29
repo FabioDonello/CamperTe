@@ -1,4 +1,4 @@
-package campergiusto.android
+package camperte.android
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

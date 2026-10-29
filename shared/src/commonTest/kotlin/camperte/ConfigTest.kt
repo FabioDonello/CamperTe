@@ -1,4 +1,4 @@
-package campergiusto
+package camperte
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
