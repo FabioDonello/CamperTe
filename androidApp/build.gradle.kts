@@ -1,3 +1,4 @@
+import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -31,6 +32,13 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
 
+val localProperties = Properties().apply {
+    rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use(::load)
+}
+
+fun releaseSigning(key: String): String? =
+    localProperties.getProperty("camperte.release.$key") ?: System.getenv("CAMPERTE_RELEASE_${key.uppercase()}")
+
 android {
     namespace = "camperte.android"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -47,9 +55,23 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    signingConfigs {
+        create("release") {
+            releaseSigning("store_file")?.let { storeFile = file(it) }
+            storePassword = releaseSigning("store_password")
+            keyAlias = releaseSigning("key_alias")
+            keyPassword = releaseSigning("key_password")
+        }
+    }
     buildTypes {
+        getByName("debug") {
+            applicationIdSuffix = ".debug"
+        }
         getByName("release") {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
+            signingConfig = signingConfigs.getByName("release").takeIf { it.storeFile != null }
         }
     }
     testOptions {
