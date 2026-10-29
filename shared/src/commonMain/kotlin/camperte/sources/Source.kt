@@ -11,5 +11,5 @@ interface Source {
 
 internal fun activeSources(): List<Source> {
     val client = createHttpClient()
-    return listOf(SubitoSource(client), CamperOnLineSource(client))
+    return listOf(SubitoSource(client), CamperOnLineSource(client), AutoScout24Source(client))
 }

@@ -40,18 +40,12 @@ internal class SubitoSource(
 }
 
 internal fun parseSubitoPage(html: String): List<Listing> {
-    val start = html.indexOf(NEXT_DATA_TAG)
-    check(start >= 0) { "Subito page has no listings data" }
-    val jsonStart = html.indexOf('>', start) + 1
-    val jsonEnd = html.indexOf("</script>", jsonStart)
-    check(jsonStart > 0 && jsonEnd > jsonStart) { "Subito listings data is not closed" }
-    val page = subitoJson.decodeFromString<NextData>(html.substring(jsonStart, jsonEnd))
+    val page = subitoJson.decodeFromString<NextData>(nextDataJson(html, "Subito"))
     return page.props.pageProps.initialState.items.originalList
         .filter { it.kind == "AdItem" }
         .mapNotNull { it.toListing() }
 }
 
-private const val NEXT_DATA_TAG = "<script id=\"__NEXT_DATA__\""
 private const val PHOTO_RULE = "?rule=gallery-desktop-2x-auto"
 
 private val subitoJson = Json { ignoreUnknownKeys = true }
