@@ -22,4 +22,27 @@
     <string name="photo_position">Foto %1$d di %2$d</string>
     <string name="new_badge">NUOVO</string>
     <string name="open_listing">Vedi annuncio</string>
+    <string name="filters">Filtri</string>
+    <string name="filters_back">Torna alla lista</string>
+    <string name="filters_price">Prezzo</string>
+    <string name="filters_price_from">Da</string>
+    <string name="filters_price_to">A</string>
+    <string name="filters_distance">Distanza da qui</string>
+    <string name="filters_distance_hint">Misurata dalla posizione del telefono</string>
+    <string name="filters_distance_km">%1$d km</string>
+    <string name="filters_whole_italy">Tutta Italia</string>
+    <string name="filters_location_off">La posizione del telefono non è attiva, quindi mostriamo i camper delle regioni impostate.</string>
+    <string name="filters_enable_location">Attiva la posizione</string>
+    <string name="filters_vehicle">Anno e chilometri</string>
+    <string name="filters_min_year">Immatricolato dal</string>
+    <string name="filters_max_mileage">Chilometri al massimo</string>
+    <string name="filters_types">Tipologie</string>
+    <string name="filters_show">Mostra i camper</string>
+    <string name="filters_reset">Ripristina i valori iniziali</string>
+    <string name="filters_decrease">Diminuisci %1$s</string>
+    <string name="filters_increase">Aumenta %1$s</string>
+    <string name="location_title">Cerchiamo i camper vicini a voi?</string>
+    <string name="location_text">Per sapere quanto è lontano ogni camper, CamperTe ha bisogno della posizione del telefono. La usa solo per calcolare la distanza.</string>
+    <string name="location_allow">Usa la mia posizione</string>
+    <string name="location_not_now">Non ora</string>
 </resources>

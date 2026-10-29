@@ -35,7 +35,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.ktor.client.core)
-            implementation(libs.multiplatform.settings)
+            api(libs.multiplatform.settings)
         }
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)
@@ -47,6 +47,7 @@ kotlin {
             implementation(libs.kotlin.test)
             implementation(libs.kotlinx.coroutines.test)
             implementation(libs.ktor.client.mock)
+            implementation(libs.multiplatform.settings.test)
         }
     }
 }

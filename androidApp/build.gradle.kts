@@ -25,6 +25,7 @@ dependencies {
 
     testDebugImplementation(libs.junit)
     testDebugImplementation(libs.robolectric)
+    testDebugImplementation(libs.multiplatform.settings.test)
     testDebugImplementation(platform(libs.androidx.compose.bom))
     testDebugImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.test.manifest)

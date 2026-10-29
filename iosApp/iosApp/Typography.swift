@@ -21,12 +21,16 @@ extension View {
 }
 
 struct ActionButtonStyle: ButtonStyle {
+    var horizontalPadding: CGFloat = 32
+    var minHeight: CGFloat = 56
+    var fontSize: CGFloat = 19
+
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaledFont(19, weight: .bold)
+            .scaledFont(fontSize, weight: .bold)
             .foregroundStyle(.white)
-            .padding(.horizontal, 32)
-            .frame(minHeight: 56)
+            .padding(.horizontal, horizontalPadding)
+            .frame(minHeight: minHeight)
             .background(Color.actionBlue.opacity(configuration.isPressed ? 0.8 : 1), in: RoundedRectangle(cornerRadius: 14))
             .shadow(color: Color.actionBlue.opacity(0.3), radius: 3, y: 2)
     }

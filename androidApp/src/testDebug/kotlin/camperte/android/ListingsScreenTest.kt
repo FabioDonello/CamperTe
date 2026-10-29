@@ -30,6 +30,7 @@ class ListingsScreenTest {
 
     private var refreshes = 0
     private var retries = 0
+    private var filterOpenings = 0
     private val opened = mutableListOf<String>()
 
     private val complete = ShownListing(
@@ -44,17 +45,19 @@ class ListingsScreenTest {
         ),
         bonusWords = listOf("letto fisso", "garage"),
         isNew = true,
+        distanceKm = 42,
     )
-    private val bare = ShownListing(listing(id = "elnagh", title = "Camper Elnagh Baron"), emptyList(), isNew = false)
+    private val bare = ShownListing(listing(id = "elnagh", title = "Camper Elnagh Baron"), emptyList(), isNew = false, distanceKm = null)
 
     private fun setContent(result: SearchResult?, darkTheme: Boolean = false, isRefreshing: Boolean = false) {
         rule.setContent {
             CamperTeTheme(darkTheme = darkTheme) {
                 ListingsScreen(
-                    state = ListingsState(result, isRefreshing),
+                    state = ListingsState(result, isRefreshing, filtersSummary = "entro 150 km · dal 2008"),
                     onRefresh = { refreshes++ },
                     onRetry = { retries++ },
                     onOpenListing = { opened += it },
+                    onOpenFilters = { filterOpenings++ },
                 )
             }
         }
@@ -95,6 +98,23 @@ class ListingsScreenTest {
     }
 
     @Test
+    fun opensFiltersFromButtonAndSummary() {
+        setContent(found(listOf(bare)))
+
+        rule.onNodeWithText(string(R.string.filters)).performClick()
+        rule.onNodeWithText("entro 150 km · dal 2008").performClick()
+
+        assertEquals(2, filterOpenings)
+    }
+
+    @Test
+    fun showsDistanceOnThePhoto() {
+        setContent(found(listOf(complete)))
+
+        rule.onNodeWithText("a 42 km").assertIsDisplayed()
+    }
+
+    @Test
     fun hidesNewCounterWhenNothingIsNew() {
         setContent(found(listOf(bare)))
 
@@ -105,10 +125,10 @@ class ListingsScreenTest {
     fun showsListingDetails() {
         setContent(found(listOf(complete)))
 
-        rule.onNodeWithText("€ 28.500").assertIsDisplayed()
-        rule.onNodeWithText("Mansardato Laika Ecovip").assertIsDisplayed()
-        rule.onNodeWithText("2012 · 98.000 km · Brescia").assertIsDisplayed()
-        rule.onNodeWithText(string(R.string.new_badge)).assertIsDisplayed()
+        rule.onNodeWithText("€ 28.500").performScrollTo().assertIsDisplayed()
+        rule.onNodeWithText("Mansardato Laika Ecovip").performScrollTo().assertIsDisplayed()
+        rule.onNodeWithText("2012 · 98.000 km · Brescia").performScrollTo().assertIsDisplayed()
+        rule.onNodeWithText(string(R.string.new_badge)).performScrollTo().assertIsDisplayed()
         rule.onNodeWithText("letto fisso").performScrollTo().assertIsDisplayed()
         rule.onNodeWithText("garage").performScrollTo().assertIsDisplayed()
     }
@@ -135,7 +155,7 @@ class ListingsScreenTest {
 
     @Test
     fun hidesPhotoCounterForSinglePhoto() {
-        setContent(found(listOf(ShownListing(listing(id = "one", title = "Uno", photoUrls = listOf("https://example.com/1.jpg")), emptyList(), false))))
+        setContent(found(listOf(ShownListing(listing(id = "one", title = "Uno", photoUrls = listOf("https://example.com/1.jpg")), emptyList(), false, null))))
 
         rule.onAllNodesWithContentDescription("Foto", substring = true).assertCountEquals(0)
     }
@@ -153,7 +173,7 @@ class ListingsScreenTest {
     fun rendersInTheDarkTheme() {
         setContent(found(listOf(complete)), darkTheme = true)
 
-        rule.onNodeWithText("Mansardato Laika Ecovip").assertIsDisplayed()
+        rule.onNodeWithText("Mansardato Laika Ecovip").performScrollTo().assertIsDisplayed()
     }
 
     private fun found(listings: List<ShownListing>, unavailableSources: List<String> = emptyList()) =
@@ -181,6 +201,7 @@ class ListingsScreenTest {
         shortDescription = null,
         photoUrls = photoUrls,
         url = "https://example.com/$id",
+        position = null,
     )
 
     private fun string(id: Int) = RuntimeEnvironment.getApplication().getString(id)

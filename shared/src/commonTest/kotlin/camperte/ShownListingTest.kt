@@ -32,6 +32,12 @@ class ShownListingTest {
     }
 
     @Test
+    fun describesDistanceOnlyWhenKnown() {
+        assertEquals("a 42 km", shown(distanceKm = 42).distanceText)
+        assertNull(shown().distanceText)
+    }
+
+    @Test
     fun usesSingularForOneBerth() {
         assertEquals("1 posto letto", shown(berths = 1).detailsText)
     }
@@ -43,6 +49,7 @@ class ShownListingTest {
         camperType: String? = null,
         berths: Int? = null,
         location: String? = null,
+        distanceKm: Int? = null,
     ) = ShownListing(
         listing = Listing(
             id = "test-1",
@@ -58,8 +65,10 @@ class ShownListingTest {
             shortDescription = null,
             photoUrls = emptyList(),
             url = "https://example.com/test-1",
+            position = null,
         ),
         bonusWords = emptyList(),
         isNew = false,
+        distanceKm = distanceKm,
     )
 }

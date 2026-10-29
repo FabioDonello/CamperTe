@@ -58,7 +58,7 @@ private struct PhotoArea: View {
             .overlay { gallery }
             .clipped()
             .overlay(alignment: .bottomLeading) {
-                BottomOverlay(price: shown.priceText, page: page, photoCount: photos.count)
+                BottomOverlay(price: shown.priceText, distance: shown.distanceText, page: page, photoCount: photos.count)
             }
             .overlay(alignment: .topLeading) {
                 if shown.isNew {
@@ -132,6 +132,7 @@ private struct PhotoCounter: View {
 
 private struct BottomOverlay: View {
     let price: String?
+    let distance: String?
     let page: Int
     let photoCount: Int
 
@@ -140,13 +141,18 @@ private struct BottomOverlay: View {
     private var showsDots: Bool { (2...Self.maxDots).contains(photoCount) }
 
     var body: some View {
-        if price != nil || showsDots {
+        if price != nil || distance != nil || showsDots {
             HStack(alignment: .bottom) {
                 Text(price ?? "")
                     .scaledFont(30, weight: .bold, relativeTo: .title)
                 Spacer()
-                if showsDots {
-                    PageDots(current: page, count: photoCount).padding(.bottom, 12)
+                VStack(alignment: .trailing, spacing: 8) {
+                    if let distance {
+                        Text(distance).scaledFont(17, weight: .medium)
+                    }
+                    if showsDots {
+                        PageDots(current: page, count: photoCount).padding(.bottom, 6)
+                    }
                 }
             }
             .foregroundStyle(.white)

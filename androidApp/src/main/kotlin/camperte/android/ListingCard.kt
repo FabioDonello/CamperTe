@@ -107,7 +107,7 @@ private fun PhotoArea(shown: ShownListing) {
         if (photos.size > 1) {
             PhotoCounter(pagerState.currentPage + 1, photos.size, Modifier.align(Alignment.TopEnd).padding(14.dp))
         }
-        BottomOverlay(shown.priceText, pagerState.currentPage, photos.size, Modifier.align(Alignment.BottomStart))
+        BottomOverlay(shown.priceText, shown.distanceText, pagerState.currentPage, photos.size, Modifier.align(Alignment.BottomStart))
     }
 }
 
@@ -156,9 +156,9 @@ private fun PhotoCounter(position: Int, total: Int, modifier: Modifier = Modifie
 }
 
 @Composable
-private fun BottomOverlay(price: String?, currentPage: Int, photoCount: Int, modifier: Modifier = Modifier) {
+private fun BottomOverlay(price: String?, distance: String?, currentPage: Int, photoCount: Int, modifier: Modifier = Modifier) {
     val showDots = photoCount in 2..MAX_DOTS
-    if (price == null && !showDots) return
+    if (price == null && distance == null && !showDots) return
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -168,8 +168,11 @@ private fun BottomOverlay(price: String?, currentPage: Int, photoCount: Int, mod
         verticalAlignment = Alignment.Bottom,
     ) {
         Text(price.orEmpty(), color = Color.White, fontSize = 30.sp, lineHeight = 36.sp, fontWeight = FontWeight.Bold)
-        if (showDots) {
-            PageDots(currentPage, photoCount, Modifier.padding(bottom = 12.dp))
+        Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            distance?.let { Text(it, color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Medium) }
+            if (showDots) {
+                PageDots(currentPage, photoCount, Modifier.padding(bottom = 6.dp))
+            }
         }
     }
 }
