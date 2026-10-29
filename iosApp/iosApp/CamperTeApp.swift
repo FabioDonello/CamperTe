@@ -1,12 +1,12 @@
-import Shared
 import SwiftUI
 
 @main
 struct CamperTeApp: App {
+    @State private var model = ListingsModel()
+
     var body: some Scene {
         WindowGroup {
-            Text("CamperTe")
-                .font(.largeTitle)
+            ListingsView(model: model)
         }
     }
 }
